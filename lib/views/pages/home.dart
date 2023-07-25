@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fictive_box_task/providers/location_details_provider.dart';
 import 'package:fictive_box_task/providers/user_details_provider.dart';
 import 'package:fictive_box_task/utils/string_utils.dart';
@@ -28,11 +30,7 @@ class _HomeState extends State<Home> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       final ref = Provider.of<UserDetailsProvider>(context, listen: false);
-      final locationRef =
-          Provider.of<LocationDetailsProvider>(context, listen: false);
-      ref.getUserDetails();
-      locationRef.getCurrentLocation();
-      locationRef.getLocationCoordinates("Noida, Uttar Pradesh");
+      ref.getUserDetails(context);
     });
   }
 
@@ -77,27 +75,37 @@ class _HomeState extends State<Home> {
                   "${StringUtils.poojaDuration}${data.pujaDuration}",
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                const SizedBox(height: 5.0,),
+                const SizedBox(
+                  height: 5.0,
+                ),
                 Text(
                   "${StringUtils.poojaLang}${data.pujaLanguage}",
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                const SizedBox(height: 5.0,),
+                const SizedBox(
+                  height: 5.0,
+                ),
                 Text(
                   "${StringUtils.poojaMode}${data.pujaMode}",
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                const SizedBox(height: 5.0,),
+                const SizedBox(
+                  height: 5.0,
+                ),
                 Text(
                   "${StringUtils.name}${data.name}",
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                const SizedBox(height: 5.0,),
+                const SizedBox(
+                  height: 5.0,
+                ),
                 Text(
                   "${StringUtils.email}${data.email}",
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                const SizedBox(height: 5.0,),
+                const SizedBox(
+                  height: 5.0,
+                ),
                 Text(
                   "${StringUtils.phone}${data.phone}",
                   style: Theme.of(context).textTheme.bodyMedium,
@@ -110,9 +118,11 @@ class _HomeState extends State<Home> {
                       const SizedBox(
                         width: 4.0,
                       ),
-                      Text(
-                        data.address,
-                        style: Theme.of(context).textTheme.bodyMedium,
+                      Flexible(
+                        child: Text(
+                          data.address,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                       ),
                     ],
                   ),
@@ -131,22 +141,28 @@ class _HomeState extends State<Home> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(130.0, 48.0),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0))),
-              onPressed: () {
-                final userRef =
-                    Provider.of<UserDetailsProvider>(context, listen: false);
-                final locationRef = Provider.of<LocationDetailsProvider>(
-                    context,
-                    listen: false);
-                userRef.goToRouteScreen(context,
-                    source: locationRef.source,
-                    destination: locationRef.destination);
-              },
-              child: Text(StringUtils.showDirection.toUpperCase())),
+          Consumer<UserDetailsProvider>(builder: (context, userDetailsRef, _) {
+            if (userDetailsRef.loading) {
+              return const SizedBox.shrink();
+            } else {
+              return ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(130.0, 48.0),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0))),
+                  onPressed: () {
+                    final userRef = Provider.of<UserDetailsProvider>(context,
+                        listen: false);
+                    final locationRef = Provider.of<LocationDetailsProvider>(
+                        context,
+                        listen: false);
+                    userRef.goToRouteScreen(context,
+                        source: locationRef.source,
+                        destination: locationRef.destination);
+                  },
+                  child: Text(StringUtils.showDirection.toUpperCase()));
+            }
+          }),
         ],
       ),
     );
